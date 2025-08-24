@@ -4,19 +4,26 @@
 import { RecurringTransactionsClient } from "@/components/dashboard/recurring-transactions-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCollection } from "@/hooks/use-collection";
-import type { Category, ScheduledTransaction } from "@/lib/types";
+import type { BankAccount, Category, CreditCard, ScheduledTransaction } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
 export default function RecurringPage() {
   const { user } = useAuth();
   const { data: scheduledTransactions, loading: scheduledTransactionsLoading } = useCollection<ScheduledTransaction>(`users/${user?.uid}/scheduledTransactions`);
   const { data: categories, loading: categoriesLoading } = useCollection<Category>(`users/${user?.uid}/categories`);
+  const { data: accounts, loading: accountsLoading } = useCollection<BankAccount>(`users/${user?.uid}/accounts`);
+  const { data: creditCards, loading: creditCardsLoading } = useCollection<CreditCard>(`users/${user?.uid}/creditCards`);
   
-  const isLoading = scheduledTransactionsLoading || categoriesLoading;
+  const isLoading = scheduledTransactionsLoading || categoriesLoading || accountsLoading || creditCardsLoading;
   
   if (isLoading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>
   }
 
-  return <RecurringTransactionsClient initialScheduledTransactions={scheduledTransactions} categories={categories} />;
+  return <RecurringTransactionsClient 
+            initialScheduledTransactions={scheduledTransactions} 
+            categories={categories}
+            accounts={accounts}
+            creditCards={creditCards} 
+          />;
 }

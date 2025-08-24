@@ -56,4 +56,6 @@ export interface ScheduledTransaction {
   startDate: string;
   endDate?: string;
   lastProcessedDate?: string;
+  accountId?: string;
+  creditCardId?: string;
 }

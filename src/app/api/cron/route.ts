@@ -92,6 +92,8 @@ export async function POST(request: Request) {
                     date: nextDueDate.toISOString(),
                     description: scheduledTx.description,
                     type: scheduledTx.type,
+                    accountId: scheduledTx.accountId,
+                    creditCardId: scheduledTx.creditCardId,
                 };
                 await db.collection(`users/${userId}/transactions`).add({
                     ...newTransaction,

@@ -1,6 +1,7 @@
 // src/components/dashboard/add-scheduled-transaction-dialog.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,13 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Category, ScheduledTransaction } from "@/lib/types";
+import type { BankAccount, Category, CreditCard, ScheduledTransaction } from "@/lib/types";
 
 interface AddScheduledTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: Omit<ScheduledTransaction, "id">) => void;
   categories: Category[];
+  accounts: BankAccount[];
+  creditCards: CreditCard[];
   transactionToEdit?: ScheduledTransaction | null;
 }
 
@@ -34,8 +37,16 @@ export function AddScheduledTransactionDialog({
   onOpenChange,
   onSubmit,
   categories,
+  accounts,
+  creditCards,
   transactionToEdit,
 }: AddScheduledTransactionDialogProps) {
+  const [transactionType, setTransactionType] = useState(transactionToEdit?.type || 'expense');
+  
+  useEffect(() => {
+    setTransactionType(transactionToEdit?.type || 'expense');
+  }, [transactionToEdit]);
+  
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -47,6 +58,8 @@ export function AddScheduledTransactionDialog({
             amount: parseFloat(values.amount),
             startDate: new Date(values.startDate).toISOString(),
             endDate: values.endDate ? new Date(values.endDate).toISOString() : undefined,
+            creditCardId: values.type === 'expense' && values.creditCardId !== 'none' ? values.creditCardId : undefined,
+            accountId: values.accountId !== 'none' ? values.accountId : undefined,
         })
     }
   };
@@ -97,7 +110,7 @@ export function AddScheduledTransactionDialog({
                 Type
               </Label>
               <div className="col-span-3">
-                <Select name="type" defaultValue={transactionToEdit?.type || 'expense'}>
+                <Select name="type" defaultValue={transactionType} onValueChange={setTransactionType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -127,6 +140,48 @@ export function AddScheduledTransactionDialog({
                 </Select>
               </div>
             </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="accountId" className="text-right">
+                  Account
+                </Label>
+                <div className="col-span-3">
+                  <Select name="accountId" defaultValue={transactionToEdit?.accountId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {accounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+            </div>
+            {transactionType === 'expense' && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="creditCardId" className="text-right">
+                  Credit Card
+                </Label>
+                <div className="col-span-3">
+                  <Select name="creditCardId" defaultValue={transactionToEdit?.creditCardId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="(Optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {creditCards.map((card) => (
+                        <SelectItem key={card.id} value={card.id}>
+                          {card.name} (**** {card.last4})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="frequency" className="text-right">
                 Frequency
