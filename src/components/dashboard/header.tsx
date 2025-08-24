@@ -27,6 +27,10 @@ function getPageTitle(pathname: string) {
       return "Budgets";
     case "/dashboard/reports":
       return "Reports";
+    case "/dashboard/profile":
+      return "Profile";
+    case "/dashboard/settings":
+      return "Settings";
     default:
       return "FinWise";
   }
@@ -46,7 +50,7 @@ export function Header() {
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     const names = name.split(' ');
-    if (names.length > 1) {
+    if (names.length > 1 && names[1]) {
       return names[0][0] + names[names.length - 1][0];
     }
     return name[0];
@@ -71,9 +75,11 @@ export function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
