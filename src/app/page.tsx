@@ -285,16 +285,50 @@ export default function Home() {
         </section>
 
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 FinWise. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Terms of Service
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Privacy
-          </Link>
-        </nav>
+      <footer className="bg-secondary/50">
+        <div className="container py-12 px-4 md:px-6">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="space-y-4 md:col-span-1">
+              <Link href="#" className="flex items-center" prefetch={false}>
+                <FinWiseLogo className="h-8 w-auto" />
+              </Link>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Take control of your finances with smart budgeting and insightful analysis.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 md:col-span-3 gap-8">
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm">Product</h4>
+                <nav className="grid gap-2">
+                  <Link href="#features" className="text-sm hover:underline" prefetch={false}>Features</Link>
+                  <Link href="/signup" className="text-sm hover:underline" prefetch={false}>Pricing</Link>
+                  <Link href="#how-it-works" className="text-sm hover:underline" prefetch={false}>How it Works</Link>
+                </nav>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm">Company</h4>
+                <nav className="grid gap-2">
+                  <Link href="#" className="text-sm hover:underline" prefetch={false}>About Us</Link>
+                  <Link href="#" className="text-sm hover:underline" prefetch={false}>Contact</Link>
+                </nav>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm">Legal</h4>
+                <nav className="grid gap-2">
+                  <Link href="/terms" className="text-sm hover:underline" prefetch={false}>
+                    Terms of Service
+                  </Link>
+                  <Link href="/privacy" className="text-sm hover:underline" prefetch={false}>
+                    Privacy Policy
+                  </Link>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
+            &copy; 2024 FinWise. All rights reserved.
+          </div>
+        </div>
       </footer>
     </div>
   );
