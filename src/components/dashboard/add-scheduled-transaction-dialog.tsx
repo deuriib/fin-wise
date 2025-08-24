@@ -110,7 +110,7 @@ export function AddScheduledTransactionDialog({
                 Type
               </Label>
               <div className="col-span-3">
-                <Select name="type" defaultValue={transactionType} onValueChange={setTransactionType}>
+                <Select name="type" value={transactionType} onValueChange={setTransactionType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -145,7 +145,7 @@ export function AddScheduledTransactionDialog({
                   Account
                 </Label>
                 <div className="col-span-3">
-                  <Select name="accountId" defaultValue={transactionToEdit?.accountId}>
+                  <Select name="accountId" defaultValue={transactionToEdit?.accountId || 'none'}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select an account" />
                     </SelectTrigger>
@@ -166,7 +166,7 @@ export function AddScheduledTransactionDialog({
                   Credit Card
                 </Label>
                 <div className="col-span-3">
-                  <Select name="creditCardId" defaultValue={transactionToEdit?.creditCardId}>
+                  <Select name="creditCardId" defaultValue={transactionToEdit?.creditCardId || 'none'}>
                     <SelectTrigger>
                       <SelectValue placeholder="(Optional)" />
                     </SelectTrigger>
