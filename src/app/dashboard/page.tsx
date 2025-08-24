@@ -1,13 +1,24 @@
+// src/app/dashboard/page.tsx
+"use client";
+
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
-import { transactions, budgets, categories } from "@/lib/mock-data";
+import { useAuth } from "@/hooks/use-auth";
+import { useCollection } from "@/hooks/use-collection";
+import type { Budget, Category, Transaction } from "@/lib/types";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
-  // In a real app, this data would be fetched from an API
-  const props = {
-    transactions,
-    budgets,
-    categories,
-  };
+  const { user } = useAuth();
 
-  return <DashboardClient {...props} />;
+  const { data: transactions, loading: transactionsLoading } = useCollection<Transaction>(`users/${user?.uid}/transactions`);
+  const { data: budgets, loading: budgetsLoading } = useCollection<Budget>(`users/${user?.uid}/budgets`);
+  const { data: categories, loading: categoriesLoading } = useCollection<Category>(`users/${user?.uid}/categories`);
+  
+  const isLoading = transactionsLoading || budgetsLoading || categoriesLoading;
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  }
+
+  return <DashboardClient transactions={transactions} budgets={budgets} categories={categories} />;
 }

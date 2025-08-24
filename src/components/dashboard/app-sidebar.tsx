@@ -1,3 +1,4 @@
+// src/components/dashboard/app-sidebar.tsx
 "use client";
 
 import {
@@ -16,11 +17,10 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { FinWiseLogo } from "@/components/icons/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 const menuItems = [
   {
@@ -47,6 +47,13 @@ const menuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuth();
+  
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   return (
     <Sidebar>
@@ -80,11 +87,9 @@ export function AppSidebar() {
                 </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Logout">
-                    <Link href="/login">
-                        <LogOut />
-                        <span>Logout</span>
-                    </Link>
+                <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                    <LogOut />
+                    <span>Logout</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

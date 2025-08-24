@@ -1,3 +1,4 @@
+// src/components/dashboard/transactions-client.tsx
 "use client";
 
 import { useState } from "react";
@@ -21,6 +22,8 @@ import { MoreHorizontal, PlusCircle } from "lucide-react";
 import type { Category, Transaction } from "@/lib/types";
 import { AddTransactionDialog } from "./add-transaction-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { addDocument, updateDocument, deleteDocument } from "@/services/firestore";
 
 interface TransactionsClientProps {
   initialTransactions: Transaction[];
@@ -31,11 +34,13 @@ export function TransactionsClient({
   initialTransactions,
   categories,
 }: TransactionsClientProps) {
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [transactionToEdit, setTransactionToEdit] =
     useState<Transaction | null>(null);
   const { toast } = useToast();
+  
+  const transactionsPath = `users/${user?.uid}/transactions`;
 
   const handleAddTransaction = () => {
     setTransactionToEdit(null);
@@ -47,29 +52,28 @@ export function TransactionsClient({
     setIsDialogOpen(true);
   };
 
-  const handleDeleteTransaction = (id: string) => {
-    setTransactions(transactions.filter((t) => t.id !== id));
-    toast({ title: "Transaction deleted successfully." });
+  const handleDeleteTransaction = async (id: string) => {
+    try {
+      await deleteDocument(transactionsPath, id);
+      toast({ title: "Transaction deleted successfully." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error deleting transaction." });
+    }
   };
 
-  const handleSubmit = (values: Omit<Transaction, "id">) => {
-    if (transactionToEdit) {
-      setTransactions(
-        transactions.map((t) =>
-          t.id === transactionToEdit.id
-            ? { ...transactionToEdit, ...values }
-            : t
-        )
-      );
-      toast({ title: "Transaction updated successfully." });
-    } else {
-      setTransactions([
-        { ...values, id: Date.now().toString() },
-        ...transactions,
-      ]);
-      toast({ title: "Transaction added successfully." });
+  const handleSubmit = async (values: Omit<Transaction, "id">) => {
+    try {
+      if (transactionToEdit) {
+        await updateDocument(transactionsPath, transactionToEdit.id, values);
+        toast({ title: "Transaction updated successfully." });
+      } else {
+        await addDocument(transactionsPath, values);
+        toast({ title: "Transaction added successfully." });
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+       toast({ variant: "destructive", title: "Error saving transaction." });
     }
-    setIsDialogOpen(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -106,7 +110,7 @@ export function TransactionsClient({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.map((transaction) => {
+            {initialTransactions.map((transaction) => {
               const category = categories.find(
                 (c) => c.id === transaction.categoryId
               );

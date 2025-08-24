@@ -1,3 +1,4 @@
+// src/components/dashboard/header.tsx
 "use client";
 
 import {
@@ -13,7 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 function getPageTitle(pathname: string) {
   switch (pathname) {
@@ -32,7 +34,24 @@ function getPageTitle(pathname: string) {
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
   const title = getPageTitle(pathname);
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/login');
+  };
+  
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return names[0][0] + names[names.length - 1][0];
+    }
+    return name[0];
+  }
+
 
   return (
     <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-6">
@@ -44,8 +63,8 @@ export function Header() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
             <Avatar>
-              <AvatarImage src="https://placehold.co/40x40.png" />
-              <AvatarFallback>U</AvatarFallback>
+              <AvatarImage src={user?.photoURL || "https://placehold.co/40x40.png"} />
+              <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -57,11 +76,9 @@ export function Header() {
             <span>Profile</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/login">
+          <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
-            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

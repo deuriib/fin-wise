@@ -1,6 +1,7 @@
+// src/components/dashboard/budgets-client.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import type { Budget, Category, Transaction } from "@/lib/types";
 import { AddBudgetDialog } from "./add-budget-dialog";
@@ -13,6 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { addDocument, updateDocument, deleteDocument } from "@/services/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 interface BudgetsClientProps {
   initialBudgets: Budget[];
@@ -25,14 +29,16 @@ export function BudgetsClient({
   categories,
   transactions,
 }: BudgetsClientProps) {
-  const [budgets, setBudgets] = useState<Budget[]>(
-    initialBudgets.map(budget => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const budgetsPath = `users/${user?.uid}/budgets`;
+  
+  const budgets = useMemo(() => initialBudgets.map(budget => {
       const spent = transactions
         .filter(t => t.type === 'expense' && t.categoryId === budget.categoryId)
         .reduce((sum, t) => sum + t.amount, 0);
       return { ...budget, spent };
-    })
-  );
+    }), [initialBudgets, transactions]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [budgetToEdit, setBudgetToEdit] = useState<Budget | null>(null);
@@ -47,21 +53,28 @@ export function BudgetsClient({
     setIsDialogOpen(true);
   };
 
-  const handleDeleteBudget = (id: string) => {
-    setBudgets(budgets.filter(b => b.id !== id));
+  const handleDeleteBudget = async (id: string) => {
+    try {
+      await deleteDocument(budgetsPath, id);
+      toast({ title: "Budget deleted successfully." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error deleting budget." });
+    }
   };
 
-  const handleSubmit = (values: Omit<Budget, "id" | "spent">) => {
-    if (budgetToEdit) {
-      setBudgets(
-        budgets.map((b) =>
-          b.id === budgetToEdit.id ? { ...b, ...values } : b
-        )
-      );
-    } else {
-      setBudgets([...budgets, { ...values, id: Date.now().toString(), spent: 0 }]);
+  const handleSubmit = async (values: Omit<Budget, "id" | "spent">) => {
+    try {
+      if (budgetToEdit) {
+        await updateDocument(budgetsPath, budgetToEdit.id, values);
+        toast({ title: "Budget updated successfully." });
+      } else {
+        await addDocument(budgetsPath, values);
+        toast({ title: "Budget added successfully." });
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error saving budget." });
     }
-    setIsDialogOpen(false);
   };
 
   const formatCurrency = (amount: number) => {
