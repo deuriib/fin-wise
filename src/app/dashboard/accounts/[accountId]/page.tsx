@@ -11,7 +11,7 @@ import { useMemo } from "react";
 
 export default function AccountDetailPage({ params }: { params: { accountId: string } }) {
     const { user } = useAuth();
-    const accountId = params.accountId;
+    const { accountId } = params;
 
     const { data: account, loading: accountLoading } = useDocument<BankAccount>(`users/${user?.uid}/accounts/${accountId}`);
     const { data: transactionsData, loading: transactionsLoading } = useCollection<Transaction>(`users/${user?.uid}/transactions`);
