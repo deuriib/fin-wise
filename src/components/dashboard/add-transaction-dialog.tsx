@@ -1,5 +1,7 @@
+// src/components/dashboard/add-transaction-dialog.tsx
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,13 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Category, Transaction } from "@/lib/types";
+import type { Category, Transaction, CreditCard } from "@/lib/types";
 
 interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: Omit<Transaction, "id">) => void;
   categories: Category[];
+  creditCards: CreditCard[];
   transactionToEdit?: Transaction | null;
 }
 
@@ -33,19 +36,30 @@ export function AddTransactionDialog({
   onOpenChange,
   onSubmit,
   categories,
+  creditCards,
   transactionToEdit,
 }: AddTransactionDialogProps) {
+  const [transactionType, setTransactionType] = useState(transactionToEdit?.type || 'expense');
+  
+  useEffect(() => {
+    setTransactionType(transactionToEdit?.type || 'expense');
+  }, [transactionToEdit]);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const values = Object.fromEntries(formData.entries()) as any;
 
     if (values.amount && values.categoryId && values.date && values.type) {
-        onSubmit({
-            ...values,
+        const submissionData: Omit<Transaction, "id"> = {
+            description: values.description,
             amount: parseFloat(values.amount),
             date: new Date(values.date).toISOString(),
-        })
+            type: values.type,
+            categoryId: values.categoryId,
+            creditCardId: values.type === 'expense' && values.creditCardId ? values.creditCardId : undefined,
+        }
+        onSubmit(submissionData);
     }
   };
 
@@ -69,7 +83,7 @@ export function AddTransactionDialog({
                 Type
               </Label>
               <div className="col-span-3">
-                <Select name="type" defaultValue={transactionToEdit?.type || 'expense'}>
+                <Select name="type" defaultValue={transactionType} onValueChange={setTransactionType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -114,6 +128,28 @@ export function AddTransactionDialog({
                 </Select>
               </div>
             </div>
+            {transactionType === 'expense' && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="creditCardId" className="text-right">
+                  Credit Card
+                </Label>
+                <div className="col-span-3">
+                  <Select name="creditCardId" defaultValue={transactionToEdit?.creditCardId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="(Optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {creditCards.map((card) => (
+                        <SelectItem key={card.id} value={card.id}>
+                          {card.name} (**** {card.last4})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="date" className="text-right">
                 Date

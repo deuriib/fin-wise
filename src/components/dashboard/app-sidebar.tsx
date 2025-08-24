@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   Repeat,
+  CreditCard,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -43,6 +44,11 @@ const menuItems = [
     href: "/dashboard/budgets",
     icon: CircleDollarSign,
     label: "Budgets",
+  },
+   {
+    href: "/dashboard/credit-cards",
+    icon: CreditCard,
+    label: "Credit Cards",
   },
   {
     href: "/dashboard/reports",

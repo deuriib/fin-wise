@@ -18,8 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
-import type { Category, Transaction } from "@/lib/types";
+import { MoreHorizontal, PlusCircle, CreditCard as CreditCardIcon } from "lucide-react";
+import type { Category, Transaction, CreditCard } from "@/lib/types";
 import { AddTransactionDialog } from "./add-transaction-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -28,11 +28,13 @@ import { addDocument, updateDocument, deleteDocument } from "@/services/firestor
 interface TransactionsClientProps {
   initialTransactions: Transaction[];
   categories: Category[];
+  creditCards: CreditCard[];
 }
 
 export function TransactionsClient({
   initialTransactions,
   categories,
+  creditCards
 }: TransactionsClientProps) {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,6 +84,12 @@ export function TransactionsClient({
       currency: "USD",
     }).format(amount);
   };
+  
+  const getCardName = (cardId?: string) => {
+      if (!cardId) return null;
+      const card = creditCards.find(c => c.id === cardId);
+      return card ? card.name : null;
+  }
 
   return (
     <div className="space-y-6">
@@ -114,10 +122,12 @@ export function TransactionsClient({
               const category = categories.find(
                 (c) => c.id === transaction.categoryId
               );
+              const cardName = getCardName(transaction.creditCardId);
               return (
                 <TableRow key={transaction.id}>
                   <TableCell className="font-medium">
                     {transaction.description}
+                    {cardName && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><CreditCardIcon className="h-3 w-3" /> {cardName}</div>}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{category?.name}</Badge>
@@ -178,6 +188,7 @@ export function TransactionsClient({
         onOpenChange={setIsDialogOpen}
         onSubmit={handleSubmit}
         categories={categories}
+        creditCards={creditCards}
         transactionToEdit={transactionToEdit}
       />
     </div>

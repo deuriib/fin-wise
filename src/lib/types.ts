@@ -7,6 +7,18 @@ export interface Transaction {
   amount: number;
   type: 'income' | 'expense';
   categoryId: string;
+  creditCardId?: string;
+}
+
+export interface CreditCard {
+    id: string;
+    name: string;
+    last4: string;
+    expiryMonth: number;
+    expiryYear: number;
+    bank: string;
+    statementDate: number; // Day of the month
+    dueDate: number; // Day of the month
 }
 
 export interface Category {
