@@ -80,6 +80,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <FinWiseLogo className="h-10 w-auto text-primary" />
       </SidebarHeader>
+      <SidebarSeparator className="my-1" />
       <SidebarMenu className="flex-1">
         {menuItems.map((item) => (
           <SidebarMenuItem key={item.href}>
