@@ -59,8 +59,8 @@ export function AddTransactionDialog({
             date: new Date(values.date).toISOString(),
             type: values.type,
             categoryId: values.categoryId,
-            creditCardId: values.type === 'expense' && values.creditCardId ? values.creditCardId : undefined,
-            accountId: values.accountId ? values.accountId : undefined,
+            creditCardId: values.type === 'expense' && values.creditCardId !== 'none' ? values.creditCardId : undefined,
+            accountId: values.accountId !== 'none' ? values.accountId : undefined,
         }
         onSubmit(submissionData);
     }
@@ -141,7 +141,7 @@ export function AddTransactionDialog({
                       <SelectValue placeholder="Select an account" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {accounts.map((account) => (
                         <SelectItem key={account.id} value={account.id}>
                           {account.name}
@@ -162,7 +162,7 @@ export function AddTransactionDialog({
                       <SelectValue placeholder="(Optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {creditCards.map((card) => (
                         <SelectItem key={card.id} value={card.id}>
                           {card.name} (**** {card.last4})
