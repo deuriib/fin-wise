@@ -16,6 +16,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Repeat,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -32,6 +33,11 @@ const menuItems = [
     href: "/dashboard/transactions",
     icon: Wallet,
     label: "Transactions",
+  },
+   {
+    href: "/dashboard/recurring",
+    icon: Repeat,
+    label: "Recurring",
   },
   {
     href: "/dashboard/budgets",

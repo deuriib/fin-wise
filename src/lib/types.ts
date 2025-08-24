@@ -23,3 +23,15 @@ export interface Budget {
   spent: number;
   period: 'monthly' | 'yearly';
 }
+
+export interface ScheduledTransaction {
+  id: string;
+  description: string;
+  amount: number;
+  type: 'income' | 'expense';
+  categoryId: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  startDate: string;
+  endDate?: string;
+  lastProcessedDate?: string;
+}
