@@ -25,6 +25,15 @@ const FinancialWellnessRecommendationsInputSchema = z.object({
     .describe(
       'A description of the users financial goals, such as saving for a house or paying off debt.'
     ),
+  accounts: z.array(z.object({
+    name: z.string(),
+    type: z.string(),
+    balance: z.number(),
+  })).optional().describe("A list of the user's bank accounts and their balances."),
+  creditCards: z.array(z.object({
+    name: z.string(),
+    balance: z.number(),
+  })).optional().describe("A list of the user's credit cards and their current balances."),
 });
 export type FinancialWellnessRecommendationsInput = z.infer<
   typeof FinancialWellnessRecommendationsInputSchema
@@ -58,14 +67,29 @@ const financialWellnessRecommendationsPrompt = ai.definePrompt({
   output: {schema: FinancialWellnessRecommendationsOutputSchema},
   prompt: `You are a financial advisor providing personalized recommendations to improve financial wellness.
 
-  Based on the user's spending data, income, savings, and financial goals, provide a wellness score (0-100) and a list of actionable recommendations.
+  Based on the user's spending data, income, savings, financial goals, and financial accounts, provide a wellness score (0-100) and a list of actionable recommendations.
 
   Spending Data: {{{spendingData}}}
   Income: {{{income}}}
   Savings: {{{savings}}}
   Financial Goals: {{{financialGoals}}}
 
-  Wellness Score (0-100): The score should reflect the users overall financial health, considering their income, spending habits, savings, and progress toward their goals.
+  {{#if accounts}}
+  Bank Accounts:
+  {{#each accounts}}
+  - {{name}} ({{type}}): \${{balance}}
+  {{/each}}
+  {{/if}}
+
+  {{#if creditCards}}
+  Credit Cards:
+  {{#each creditCards}}
+  - {{name}}: \${{balance}} balance
+  {{/each}}
+  {{/if}}
+
+
+  Wellness Score (0-100): The score should reflect the users overall financial health, considering their income, spending habits, savings, debts, and progress toward their goals.
   Recommendations: Provide specific and practical recommendations tailored to the user's situation. Consider suggesting budgeting strategies, saving tips, debt management options, and investment advice.
   Be concise.
   `,
@@ -82,4 +106,3 @@ const financialWellnessRecommendationsFlow = ai.defineFlow(
     return output!;
   }
 );
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Wand2, Loader2, Sparkles } from "lucide-react";
 import { generateSpendingInsights } from "@/ai/flows/generate-spending-insights";
-import type { Budget, Category, Transaction } from "@/lib/types";
+import type { Budget, Category, Transaction, BankAccount, CreditCard } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface AIInsightsProps {
@@ -19,9 +19,11 @@ interface AIInsightsProps {
   budgets: Budget[];
   income: number;
   categories: Category[];
+  accounts: BankAccount[];
+  creditCards: CreditCard[];
 }
 
-export function AIInsights({ transactions, budgets, income, categories }: AIInsightsProps) {
+export function AIInsights({ transactions, budgets, income, categories, accounts, creditCards }: AIInsightsProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<string[]>([]);
@@ -30,6 +32,28 @@ export function AIInsights({ transactions, budgets, income, categories }: AIInsi
   const getCategoryName = (id: string) => {
     return categories.find(c => c.id === id)?.name || "Uncategorized";
   }
+
+  const accountsWithBalance = useMemo(() => {
+    return accounts.map(account => {
+        const balance = transactions.reduce((acc, t) => {
+            if (t.accountId !== account.id) return acc;
+            if (t.type === 'income') return acc + t.amount;
+            if (t.type === 'expense') return acc - t.amount;
+            return acc;
+        }, 0);
+        return { name: account.name, type: account.type, balance };
+    })
+  }, [accounts, transactions]);
+
+  const creditCardsWithBalance = useMemo(() => {
+      return creditCards.map(card => {
+          const balance = transactions
+              .filter(t => t.creditCardId === card.id && t.type === 'expense')
+              .reduce((sum, t) => sum + t.amount, 0);
+          return { name: card.name, balance };
+      });
+  }, [creditCards, transactions]);
+
 
   const handleGenerateInsights = async () => {
     setIsLoading(true);
@@ -51,7 +75,13 @@ export function AIInsights({ transactions, budgets, income, categories }: AIInsi
       
       const budgetData = budgets.map(b => ({ category: getCategoryName(b.categoryId), limit: b.limit }));
 
-      const result = await generateSpendingInsights({ income, expenses, budget: budgetData });
+      const result = await generateSpendingInsights({ 
+          income, 
+          expenses, 
+          budget: budgetData,
+          accounts: accountsWithBalance,
+          creditCards: creditCardsWithBalance,
+      });
       setInsights(result.insights);
     } catch (error) {
       console.error("Failed to generate insights:", error);

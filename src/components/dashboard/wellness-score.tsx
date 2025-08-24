@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,16 +11,18 @@ import {
 } from "@/components/ui/dialog";
 import { Target, Loader2, Sparkles } from "lucide-react";
 import { getFinancialWellnessRecommendations } from "@/ai/flows/financial-wellness-recommendations";
-import type { Category, Transaction } from "@/lib/types";
+import type { Category, Transaction, BankAccount, CreditCard } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface WellnessScoreProps {
   transactions: Transaction[];
   income: number;
   categories: Category[];
+  accounts: BankAccount[];
+  creditCards: CreditCard[];
 }
 
-export function WellnessScore({ transactions, income, categories }: WellnessScoreProps) {
+export function WellnessScore({ transactions, income, categories, accounts, creditCards }: WellnessScoreProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [score, setScore] = useState<number | null>(null);
@@ -30,6 +32,27 @@ export function WellnessScore({ transactions, income, categories }: WellnessScor
   const getCategoryName = (id: string) => {
     return categories.find(c => c.id === id)?.name || "Uncategorized";
   }
+
+  const accountsWithBalance = useMemo(() => {
+    return accounts.map(account => {
+        const balance = transactions.reduce((acc, t) => {
+            if (t.accountId !== account.id) return acc;
+            if (t.type === 'income') return acc + t.amount;
+            if (t.type === 'expense') return acc - t.amount;
+            return acc;
+        }, 0);
+        return { name: account.name, type: account.type, balance };
+    })
+  }, [accounts, transactions]);
+
+  const creditCardsWithBalance = useMemo(() => {
+      return creditCards.map(card => {
+          const balance = transactions
+              .filter(t => t.creditCardId === card.id && t.type === 'expense')
+              .reduce((sum, t) => sum + t.amount, 0);
+          return { name: card.name, balance };
+      });
+  }, [creditCards, transactions]);
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -45,6 +68,8 @@ export function WellnessScore({ transactions, income, categories }: WellnessScor
         income,
         savings: 5000, // Mock data
         financialGoals: "Save for a vacation and pay off credit card debt.", // Mock data
+        accounts: accountsWithBalance,
+        creditCards: creditCardsWithBalance,
       });
       setScore(result.wellnessScore);
       setRecommendations(result.recommendations);

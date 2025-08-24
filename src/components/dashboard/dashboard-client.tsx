@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { DollarSign, Wallet, PiggyBank, BarChart3, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
-import type { Budget, Category, Transaction } from "@/lib/types";
+import type { Budget, Category, Transaction, BankAccount, CreditCard } from "@/lib/types";
 import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -17,12 +17,16 @@ interface DashboardClientProps {
   transactions: Transaction[];
   budgets: Budget[];
   categories: Category[];
+  accounts: BankAccount[];
+  creditCards: CreditCard[];
 }
 
 export function DashboardClient({
   transactions,
   budgets,
   categories,
+  accounts,
+  creditCards,
 }: DashboardClientProps) {
   const totalIncome = transactions
     .filter((t) => t.type === "income")
@@ -97,8 +101,8 @@ export function DashboardClient({
             <CardTitle className="text-sm font-medium">AI Tools</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-end gap-2">
-            <WellnessScore transactions={transactions} income={totalIncome} categories={categories} />
-            <AIInsights transactions={transactions} budgets={budgets} income={totalIncome} categories={categories} />
+            <WellnessScore transactions={transactions} income={totalIncome} categories={categories} accounts={accounts} creditCards={creditCards} />
+            <AIInsights transactions={transactions} budgets={budgets} income={totalIncome} categories={categories} accounts={accounts} creditCards={creditCards} />
           </CardContent>
         </Card>
       </div>
