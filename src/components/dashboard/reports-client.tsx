@@ -41,35 +41,40 @@ export function ReportsClient({
   const [isLoading, setIsLoading] = useState(false);
   const reportsRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     const reportElement = reportsRef.current;
     if (!reportElement) return;
 
     setIsLoading(true);
-    try {
-      const canvas = await html2canvas(reportElement, {
-         scale: 2,
-         backgroundColor: null,
-         windowWidth: 1280, // Set a fixed width to ensure consistency
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: 'a4'
-      });
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('financial-report.pdf');
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      setIsLoading(false);
-    }
+
+    // Defer the heavy processing to allow the UI to update with the loading state first.
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(reportElement, {
+          scale: 2,
+          backgroundColor: null,
+          windowWidth: 1280, // Set a fixed width to ensure consistency
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: 'a4'
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save('financial-report.pdf');
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 100); // A small delay is enough to let the UI render the loading spinner
   };
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
