@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoriesSettings } from "./settings/categories-settings";
 import { ProfileSettings } from "./settings/profile-settings";
 import { GeneralSettings } from "./settings/general-settings";
+import { AccountSettings } from "./settings/account-settings";
 import type { Category } from "@/lib/types";
 import type { User } from "firebase/auth";
 
@@ -25,11 +26,15 @@ export function SettingsClient({ initialCategories, user }: SettingsClientProps)
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="general">General</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <ProfileSettings user={user} />
+        </TabsContent>
+        <TabsContent value="account">
+          <AccountSettings />
         </TabsContent>
         <TabsContent value="categories">
           <CategoriesSettings initialCategories={initialCategories} />
