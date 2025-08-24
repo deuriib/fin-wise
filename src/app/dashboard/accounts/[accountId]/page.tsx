@@ -7,11 +7,11 @@ import { useCollection } from "@/hooks/use-collection";
 import { useDocument } from "@/hooks/use-document";
 import type { BankAccount, CreditCard, Transaction } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, use } from "react";
 
-export default function AccountDetailPage({ params }: { params: { accountId: string } }) {
+export default function AccountDetailPage({ params }: { params: Promise<{ accountId: string }> }) {
     const { user } = useAuth();
-    const { accountId } = params;
+    const { accountId } = use(params);
 
     const { data: account, loading: accountLoading } = useDocument<BankAccount>(`users/${user?.uid}/accounts/${accountId}`);
     const { data: transactionsData, loading: transactionsLoading } = useCollection<Transaction>(`users/${user?.uid}/transactions`);
