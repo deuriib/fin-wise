@@ -40,12 +40,13 @@ export function AccountDetailClient({
   };
 
   const balance = useMemo(() => {
-    return transactions.reduce((acc, t) => {
+    const transactionTotal = transactions.reduce((acc, t) => {
         if (t.type === 'income') return acc + t.amount;
         if (t.type === 'expense') return acc - t.amount;
         return acc;
     }, 0);
-  }, [transactions]);
+    return (account.initialBalance || 0) + transactionTotal;
+  }, [transactions, account]);
 
   const associatedCreditCards = useMemo(() => {
       return creditCards.filter(c => c.bank === account.bankName);

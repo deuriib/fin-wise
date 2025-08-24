@@ -17,6 +17,7 @@ export interface BankAccount {
   bankName: string;
   accountNumberLast4: string;
   type: 'checking' | 'savings';
+  initialBalance?: number;
 }
 
 export interface CreditCard {

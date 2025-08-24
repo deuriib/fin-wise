@@ -81,12 +81,13 @@ export function AccountsClient({
 
   const accountsWithBalance = useMemo(() => {
     return initialAccounts.map(account => {
-        const balance = transactions.reduce((acc, t) => {
+        const transactionTotal = transactions.reduce((acc, t) => {
             if (t.accountId !== account.id) return acc;
             if (t.type === 'income') return acc + t.amount;
             if (t.type === 'expense') return acc - t.amount;
             return acc;
         }, 0);
+        const balance = (account.initialBalance || 0) + transactionTotal;
         return { ...account, balance };
     })
   }, [initialAccounts, transactions]);

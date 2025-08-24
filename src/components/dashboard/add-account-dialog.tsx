@@ -43,6 +43,7 @@ export function AddAccountDialog({
       onSubmit({
         ...values,
         accountNumberLast4: values.accountNumberLast4.slice(-4),
+        initialBalance: values.initialBalance ? parseFloat(values.initialBalance) : 0,
       });
     }
   };
@@ -87,6 +88,10 @@ export function AddAccountDialog({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="initialBalance" className="text-right">Initial Balance</Label>
+              <Input id="initialBalance" name="initialBalance" type="number" step="0.01" placeholder="0.00" defaultValue={accountToEdit?.initialBalance} className="col-span-3" />
             </div>
           </div>
           <DialogFooter>
