@@ -19,6 +19,7 @@ import {
   Repeat,
   CreditCard,
   Landmark,
+  HelpCircle,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -101,6 +102,14 @@ export function AppSidebar() {
                     <Link href="/dashboard/settings">
                         <Settings />
                         <span>Settings</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Help" isActive={pathname === "/dashboard/help"}>
+                    <Link href="/dashboard/help">
+                        <HelpCircle />
+                        <span>Help</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

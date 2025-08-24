@@ -37,6 +37,8 @@ function getPageTitle(pathname: string) {
       return "Profile";
     case "/dashboard/settings":
       return "Settings";
+    case "/dashboard/help":
+      return "Help";
     default:
       if (pathname.startsWith('/dashboard/accounts/')) {
         return "Account Details";
