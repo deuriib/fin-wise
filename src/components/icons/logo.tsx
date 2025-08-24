@@ -14,7 +14,7 @@ export function FinWiseLogo(props: React.SVGProps<SVGSVGElement>) {
       </style>
       <g>
         <path
-          d="M25,5 C37.5,5 37.5,45 25,45 C12.5,45 12.5,5 25,5 Z M25,12.5 C31.25,12.5 31.25,37.5 25,37.5 C18.75,37.5 18.75,12.5 25,12.5 Z"
+          d="M10 5 H 35 V 15 H 20 V 25 H 32 V 35 H 20 V 45 H 10 Z"
           fill="hsl(var(--accent))"
         />
         <text x="50" y="38" className="logo-text">
