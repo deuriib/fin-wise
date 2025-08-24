@@ -10,11 +10,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm shrink-0 sticky top-0 bg-background/95 backdrop-blur-sm z-50">
-        <Link href="#" className="flex items-center justify-center" prefetch={false}>
-          <FinWiseLogo className="h-8 w-auto" />
-          <span className="sr-only">FinWise</span>
-        </Link>
-        <nav className="ml-10 hidden lg:flex gap-4 sm:gap-6">
+        <div className="flex-1 flex justify-start">
+          <Link href="#" className="flex items-center" prefetch={false}>
+            <FinWiseLogo className="h-8 w-auto" />
+            <span className="sr-only">FinWise</span>
+          </Link>
+        </div>
+        <nav className="hidden lg:flex flex-1 justify-center gap-6">
            <Link
               href="#features"
               className="text-sm font-medium hover:underline underline-offset-4"
@@ -29,6 +31,13 @@ export default function Home() {
             >
               How It Works
             </Link>
+             <Link
+              href="/signup"
+              className="text-sm font-medium hover:underline underline-offset-4"
+              prefetch={false}
+            >
+              Pricing
+            </Link>
             <Link
               href="#testimonials"
               className="text-sm font-medium hover:underline underline-offset-4"
@@ -37,7 +46,7 @@ export default function Home() {
               Testimonials
             </Link>
         </nav>
-        <div className="ml-auto flex gap-4 sm:gap-6">
+        <div className="flex-1 flex justify-end gap-4">
           <Button variant="ghost" asChild>
             <Link
               href="/login"
@@ -180,7 +189,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+            <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center rounded-full bg-primary text-primary-foreground h-16 w-16 mb-4">
                   <span className="text-2xl font-bold">1</span>
