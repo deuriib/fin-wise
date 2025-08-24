@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import type { BankAccount, Category, CreditCard, ScheduledTransaction } from "@/lib/types";
+import type { BankAccount, Category, ScheduledTransaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { addDocument, updateDocument, deleteDocument } from "@/services/firestore";
@@ -29,14 +29,12 @@ interface RecurringTransactionsClientProps {
   initialScheduledTransactions: ScheduledTransaction[];
   categories: Category[];
   accounts: BankAccount[];
-  creditCards: CreditCard[];
 }
 
 export function RecurringTransactionsClient({
   initialScheduledTransactions,
   categories,
   accounts,
-  creditCards,
 }: RecurringTransactionsClientProps) {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -177,7 +175,6 @@ export function RecurringTransactionsClient({
         onSubmit={handleSubmit}
         categories={categories}
         accounts={accounts}
-        creditCards={creditCards}
         transactionToEdit={transactionToEdit}
       />
     </div>

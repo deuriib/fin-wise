@@ -28,7 +28,6 @@ interface AddScheduledTransactionDialogProps {
   onSubmit: (values: Omit<ScheduledTransaction, "id">) => void;
   categories: Category[];
   accounts: BankAccount[];
-  creditCards: CreditCard[];
   transactionToEdit?: ScheduledTransaction | null;
 }
 
@@ -38,7 +37,6 @@ export function AddScheduledTransactionDialog({
   onSubmit,
   categories,
   accounts,
-  creditCards,
   transactionToEdit,
 }: AddScheduledTransactionDialogProps) {
   const [transactionType, setTransactionType] = useState(transactionToEdit?.type || 'expense');
@@ -62,7 +60,6 @@ export function AddScheduledTransactionDialog({
             amount: parseFloat(values.amount),
             startDate: new Date(values.startDate).toISOString(),
             endDate: values.endDate ? new Date(values.endDate).toISOString() : undefined,
-            creditCardId: values.type === 'expense' && values.creditCardId !== 'none' ? values.creditCardId : undefined,
             accountId: values.accountId !== 'none' ? values.accountId : undefined,
         })
     }
@@ -164,28 +161,6 @@ export function AddScheduledTransactionDialog({
                   </Select>
                 </div>
             </div>
-            {transactionType === 'expense' && (
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="creditCardId" className="text-right">
-                  Credit Card
-                </Label>
-                <div className="col-span-3">
-                  <Select name="creditCardId" defaultValue={transactionToEdit?.creditCardId || 'none'}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="(Optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {creditCards.map((card) => (
-                        <SelectItem key={card.id} value={card.id}>
-                          {card.name} (**** {card.last4})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="frequency" className="text-right">
                 Frequency

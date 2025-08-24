@@ -12,9 +12,8 @@ export default function RecurringPage() {
   const { data: scheduledTransactions, loading: scheduledTransactionsLoading } = useCollection<ScheduledTransaction>(`users/${user?.uid}/scheduledTransactions`);
   const { data: categories, loading: categoriesLoading } = useCollection<Category>(`users/${user?.uid}/categories`);
   const { data: accounts, loading: accountsLoading } = useCollection<BankAccount>(`users/${user?.uid}/accounts`);
-  const { data: creditCards, loading: creditCardsLoading } = useCollection<CreditCard>(`users/${user?.uid}/creditCards`);
   
-  const isLoading = scheduledTransactionsLoading || categoriesLoading || accountsLoading || creditCardsLoading;
+  const isLoading = scheduledTransactionsLoading || categoriesLoading || accountsLoading;
   
   if (isLoading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>
@@ -24,6 +23,5 @@ export default function RecurringPage() {
             initialScheduledTransactions={scheduledTransactions} 
             categories={categories}
             accounts={accounts}
-            creditCards={creditCards} 
           />;
 }
