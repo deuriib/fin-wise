@@ -15,10 +15,10 @@ import {
   YAxis,
 } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 interface AccountDetailClientProps {
   account: BankAccount;
@@ -39,26 +39,24 @@ export function AccountDetailClient({
     }).format(amount);
   };
 
-  const { balance, accountTransactions } = useMemo(() => {
-    const accountTransactions = transactions.filter(t => t.accountId === account.id);
-    const balance = accountTransactions.reduce((acc, t) => {
+  const balance = useMemo(() => {
+    return transactions.reduce((acc, t) => {
         if (t.type === 'income') return acc + t.amount;
         if (t.type === 'expense') return acc - t.amount;
         return acc;
     }, 0);
-    return { balance, accountTransactions };
-  }, [account.id, transactions]);
+  }, [transactions]);
 
   const associatedCreditCards = useMemo(() => {
       return creditCards.filter(c => c.bank === account.bankName);
   }, [creditCards, account.bankName]);
 
-  const recentTransactions = [...accountTransactions]
+  const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
   const monthlyData: { [key: string]: { income: number, expense: number } } = {};
-  accountTransactions.forEach(t => {
+  transactions.forEach(t => {
       const month = new Date(t.date).toLocaleString('default', { month: 'short', year: '2-digit' });
       if (!monthlyData[month]) {
           monthlyData[month] = { income: 0, expense: 0 };
@@ -164,8 +162,8 @@ export function AccountDetailClient({
                           <TableRow key={transaction.id}>
                             <TableCell className="font-medium">{transaction.description}</TableCell>
                             <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                            <TableCell className={`text-right font-medium ${transaction.type === 'income' ? 'text-accent' : 'text-destructive'}`}>
-                              {transaction.type === 'expense' ? '-' : ''}{formatCurrency(transaction.amount)}
+                            <TableCell className={`text-right font-medium`}>
+                                <Badge variant={transaction.type === 'income' ? 'default' : 'destructive'} className={`${transaction.type === 'income' ? 'bg-accent text-accent-foreground' : ''}`}>{transaction.type === 'expense' ? '-' : '+'}{formatCurrency(transaction.amount)}</Badge>
                             </TableCell>
                           </TableRow>
                         ))}

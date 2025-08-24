@@ -12,7 +12,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
@@ -38,6 +38,9 @@ function getPageTitle(pathname: string) {
     case "/dashboard/settings":
       return "Settings";
     default:
+      if (pathname.startsWith('/dashboard/accounts/')) {
+        return "Account Details";
+      }
       return "FinWise";
   }
 }
@@ -71,11 +74,12 @@ export function Header() {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button variant="ghost" className="flex items-center gap-2 rounded-full p-1 pr-2">
             <Avatar>
               <AvatarImage src={user?.photoURL || "https://placehold.co/40x40.png"} />
               <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
             </Avatar>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
