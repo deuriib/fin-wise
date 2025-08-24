@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef, useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   Card,
   CardContent,
@@ -22,6 +25,8 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { Button } from "../ui/button";
+import { Download, Loader2 } from "lucide-react";
 
 interface ReportsClientProps {
   transactions: Transaction[];
@@ -32,6 +37,38 @@ export function ReportsClient({
   transactions,
   categories,
 }: ReportsClientProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const reportsRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    const reportElement = reportsRef.current;
+    if (!reportElement) return;
+
+    setIsLoading(true);
+    try {
+      const canvas = await html2canvas(reportElement, {
+         scale: 2,
+         backgroundColor: null,
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('financial-report.pdf');
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -91,65 +128,72 @@ export function ReportsClient({
 
   return (
     <div className="space-y-6">
-       <div>
+       <div className="flex justify-between items-center">
+        <div>
           <h1 className="text-3xl font-bold font-headline">Reports</h1>
           <p className="text-muted-foreground">
             Analyze your financial habits and trends over time.
           </p>
         </div>
-        
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="font-headline">Income vs. Expenses</CardTitle>
-            <CardDescription>
-              Your income compared to your expenses over time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] lg:h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={incomeVsExpenseData}>
-                <defs>
-                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Area type="monotone" dataKey="Income" stroke="hsl(var(--accent))" fillOpacity={1} fill="url(#colorIncome)" />
-                <Area type="monotone" dataKey="Expenses" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorExpense)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <Button onClick={handleDownload} disabled={isLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            Download PDF
+        </Button>
+      </div>
+      <div ref={reportsRef} className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="font-headline">Income vs. Expenses</CardTitle>
+              <CardDescription>
+                Your income compared to your expenses over time.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px] lg:h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={incomeVsExpenseData}>
+                  <defs>
+                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Area type="monotone" dataKey="Income" stroke="hsl(var(--accent))" fillOpacity={1} fill="url(#colorIncome)" />
+                  <Area type="monotone" dataKey="Expenses" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorExpense)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="font-headline">Category Spending</CardTitle>
-            <CardDescription>
-              How your spending is distributed across categories.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] lg:h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categorySpendingData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" tickFormatter={(value) => formatCurrency(value)}/>
-                <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="total" name="Total Spent" barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="font-headline">Category Spending</CardTitle>
+              <CardDescription>
+                How your spending is distributed across categories.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px] lg:h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categorySpendingData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" tickFormatter={(value) => formatCurrency(value)}/>
+                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="total" name="Total Spent" barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
