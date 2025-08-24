@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -113,6 +114,7 @@ export function AppSidebar() {
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarSeparator className="my-1" />
             <SidebarMenuItem>
                 <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
                     <LogOut />
