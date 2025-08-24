@@ -2,7 +2,7 @@
 "use client";
 
 import type { BankAccount, CreditCard, Transaction } from "@/lib/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import {
   Area,
@@ -17,8 +17,18 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MoreVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { AddAccountDialog } from "./add-account-dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { updateDocument } from "@/services/firestore";
 
 interface AccountDetailClientProps {
   account: BankAccount;
@@ -31,6 +41,11 @@ export function AccountDetailClient({
   transactions,
   creditCards,
 }: AccountDetailClientProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const accountsPath = `users/${user?.uid}/accounts`;
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -87,6 +102,20 @@ export function AccountDetailClient({
     return null
   }
 
+  const handleEdit = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = async (values: Omit<BankAccount, "id">) => {
+    try {
+      await updateDocument(accountsPath, account.id, values);
+      toast({ title: "Account updated successfully." });
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error saving account." });
+    }
+  };
+
   return (
     <div className="space-y-6">
        <div className="flex justify-start items-center mb-6">
@@ -98,9 +127,21 @@ export function AccountDetailClient({
          </Button>
       </div>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold font-headline">{account.name}</CardTitle>
-          <CardDescription>{account.bankName} - {account.type.charAt(0).toUpperCase() + account.type.slice(1)} (...{account.accountNumberLast4})</CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="text-3xl font-bold font-headline">{account.name}</CardTitle>
+            <CardDescription>{account.bankName} - {account.type.charAt(0).toUpperCase() + account.type.slice(1)} (...{account.accountNumberLast4})</CardDescription>
+          </div>
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
         <CardContent>
             <div className="text-4xl font-bold">{formatCurrency(balance)}</div>
@@ -198,8 +239,13 @@ export function AccountDetailClient({
                 </CardContent>
             </Card>
         </div>
-
       </div>
+      <AddAccountDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSubmit={handleSubmit}
+        accountToEdit={account}
+      />
     </div>
   );
 }
