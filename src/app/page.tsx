@@ -74,36 +74,36 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 mt-12">
-              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent flex flex-col">
                 <CardHeader className="flex flex-col items-center text-center gap-4">
                   <div className="bg-accent rounded-full p-3">
                     <Wallet className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">Smart Budgeting</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1">
                   <p>Create custom budgets that are easy to track. Get alerts before you overspend and stay on top of your financial goals.</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent flex flex-col">
                 <CardHeader className="flex flex-col items-center text-center gap-4">
                    <div className="bg-accent rounded-full p-3">
                     <BarChart className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">Expense Tracking</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1">
                   <p>Effortlessly log every transaction. Categorize your spending to see where your money is going and identify savings opportunities.</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent flex flex-col">
                 <CardHeader className="flex flex-col items-center text-center gap-4">
                    <div className="bg-accent rounded-full p-3">
                     <BrainCircuit className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">AI Insights</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1">
                   <p>Receive personalized recommendations and a Financial Wellness Score to gamify your financial journey and make better decisions.</p>
                 </CardContent>
               </Card>
