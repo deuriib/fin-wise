@@ -13,10 +13,11 @@ export function FinWiseLogo(props: React.SVGProps<SVGSVGElement>) {
         }
       </style>
       <g>
-        <path
-          d="M10 5 H 35 V 15 H 20 V 25 H 32 V 35 H 20 V 45 H 10 Z"
-          fill="hsl(var(--accent))"
-        />
+        <g fill="hsl(var(--accent))">
+          <path d="M10 15 a 5 5 0 0 1 5 -5 H 35 a 5 5 0 0 1 5 5 V 40 a 5 5 0 0 1 -5 5 H 15 a 5 5 0 0 1 -5 -5 Z" />
+          <path d="M10 20 H 40 V 15 a 5 5 0 0 0 -5 -5 H 15 a 5 5 0 0 0 -5 5 Z" />
+          <circle cx="32" cy="32" r="3" fill="hsl(var(--background))" />
+        </g>
         <text x="50" y="38" className="logo-text">
           FinWise
         </text>
