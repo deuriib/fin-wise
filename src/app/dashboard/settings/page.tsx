@@ -8,14 +8,14 @@ import type { Category } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, loading: userLoading } = useAuth();
   const { data: categories, loading: categoriesLoading } = useCollection<Category>(`users/${user?.uid}/categories`);
   
-  const isLoading = categoriesLoading;
+  const isLoading = categoriesLoading || userLoading;
   
-  if (isLoading) {
+  if (isLoading || !user) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>
   }
 
-  return <SettingsClient initialCategories={categories} />;
+  return <SettingsClient user={user} initialCategories={categories} />;
 }
