@@ -44,7 +44,11 @@ export function AddScheduledTransactionDialog({
   const [transactionType, setTransactionType] = useState(transactionToEdit?.type || 'expense');
   
   useEffect(() => {
-    setTransactionType(transactionToEdit?.type || 'expense');
+    if (transactionToEdit) {
+      setTransactionType(transactionToEdit.type);
+    } else {
+      setTransactionType('expense');
+    }
   }, [transactionToEdit]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
