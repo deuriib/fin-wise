@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { CreditCard, Transaction } from "@/lib/types";
+import type { BankAccount, CreditCard, Transaction } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { PlusCircle, MoreVertical } from "lucide-react";
 import {
@@ -21,11 +21,13 @@ import { CreditCardAdvice } from "./credit-card-advice";
 interface CreditCardsClientProps {
   initialCreditCards: CreditCard[];
   transactions: Transaction[];
+  accounts: BankAccount[];
 }
 
 export function CreditCardsClient({
   initialCreditCards,
-  transactions
+  transactions,
+  accounts,
 }: CreditCardsClientProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -123,6 +125,7 @@ export function CreditCardsClient({
         onOpenChange={setIsDialogOpen}
         onSubmit={handleSubmit}
         cardToEdit={cardToEdit}
+        accounts={accounts}
       />
     </div>
   );

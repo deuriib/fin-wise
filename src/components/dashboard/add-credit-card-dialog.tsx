@@ -12,13 +12,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { CreditCard } from "@/lib/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { BankAccount, CreditCard } from "@/lib/types";
+import { useMemo } from "react";
 
 interface AddCreditCardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: Omit<CreditCard, "id">) => void;
   cardToEdit?: CreditCard | null;
+  accounts: BankAccount[];
 }
 
 export function AddCreditCardDialog({
@@ -26,6 +35,7 @@ export function AddCreditCardDialog({
   onOpenChange,
   onSubmit,
   cardToEdit,
+  accounts,
 }: AddCreditCardDialogProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,6 +53,11 @@ export function AddCreditCardDialog({
       });
     }
   };
+
+  const uniqueBanks = useMemo(() => {
+    const bankNames = new Set(accounts.map(acc => acc.bankName));
+    return Array.from(bankNames);
+  }, [accounts]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,7 +78,20 @@ export function AddCreditCardDialog({
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="bank" className="text-right">Bank</Label>
-              <Input id="bank" name="bank" placeholder="e.g., Chase" defaultValue={cardToEdit?.bank} className="col-span-3" required />
+               <div className="col-span-3">
+                <Select name="bank" defaultValue={cardToEdit?.bank}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a bank" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueBanks.map((bank) => (
+                      <SelectItem key={bank} value={bank}>
+                        {bank}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="last4" className="text-right">Card Number</Label>
