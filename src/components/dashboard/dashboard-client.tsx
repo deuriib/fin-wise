@@ -97,8 +97,8 @@ export function DashboardClient({
             <CardTitle className="text-sm font-medium">AI Tools</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-end gap-2">
-            <WellnessScore transactions={transactions} income={totalIncome} />
-            <AIInsights transactions={transactions} budgets={budgets} income={totalIncome} />
+            <WellnessScore transactions={transactions} income={totalIncome} categories={categories} />
+            <AIInsights transactions={transactions} budgets={budgets} income={totalIncome} categories={categories} />
           </CardContent>
         </Card>
       </div>

@@ -11,20 +11,25 @@ import {
 } from "@/components/ui/dialog";
 import { Wand2, Loader2, Sparkles } from "lucide-react";
 import { generateSpendingInsights } from "@/ai/flows/generate-spending-insights";
-import type { Budget, Transaction } from "@/lib/types";
+import type { Budget, Category, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface AIInsightsProps {
   transactions: Transaction[];
   budgets: Budget[];
   income: number;
+  categories: Category[];
 }
 
-export function AIInsights({ transactions, budgets, income }: AIInsightsProps) {
+export function AIInsights({ transactions, budgets, income, categories }: AIInsightsProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const getCategoryName = (id: string) => {
+    return categories.find(c => c.id === id)?.name || "Uncategorized";
+  }
 
   const handleGenerateInsights = async () => {
     setIsLoading(true);
@@ -34,16 +39,17 @@ export function AIInsights({ transactions, budgets, income }: AIInsightsProps) {
       const expenses = transactions
         .filter((t) => t.type === "expense")
         .reduce((acc, t) => {
-          const existing = acc.find((e) => e.category === t.categoryId);
+          const categoryName = getCategoryName(t.categoryId);
+          const existing = acc.find((e) => e.category === categoryName);
           if (existing) {
             existing.amount += t.amount;
           } else {
-            acc.push({ category: t.categoryId, amount: t.amount });
+            acc.push({ category: categoryName, amount: t.amount });
           }
           return acc;
         }, [] as { category: string; amount: number }[]);
       
-      const budgetData = budgets.map(b => ({ category: b.categoryId, limit: b.limit }));
+      const budgetData = budgets.map(b => ({ category: getCategoryName(b.categoryId), limit: b.limit }));
 
       const result = await generateSpendingInsights({ income, expenses, budget: budgetData });
       setInsights(result.insights);

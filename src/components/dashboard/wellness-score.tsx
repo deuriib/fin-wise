@@ -11,20 +11,25 @@ import {
 } from "@/components/ui/dialog";
 import { Target, Loader2, Sparkles } from "lucide-react";
 import { getFinancialWellnessRecommendations } from "@/ai/flows/financial-wellness-recommendations";
-import type { Transaction } from "@/lib/types";
+import type { Category, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface WellnessScoreProps {
   transactions: Transaction[];
   income: number;
+  categories: Category[];
 }
 
-export function WellnessScore({ transactions, income }: WellnessScoreProps) {
+export function WellnessScore({ transactions, income, categories }: WellnessScoreProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [recommendations, setRecommendations] = useState<string>("");
   const { toast } = useToast();
+
+  const getCategoryName = (id: string) => {
+    return categories.find(c => c.id === id)?.name || "Uncategorized";
+  }
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -32,7 +37,7 @@ export function WellnessScore({ transactions, income }: WellnessScoreProps) {
     try {
       const spendingData = transactions
         .filter((t) => t.type === "expense")
-        .map((t) => `${t.categoryId}: $${t.amount}`)
+        .map((t) => `${getCategoryName(t.categoryId)}: $${t.amount}`)
         .join(", ");
 
       const result = await getFinancialWellnessRecommendations({
