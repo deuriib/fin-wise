@@ -67,7 +67,7 @@ export function AddScheduledTransactionDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} key={transactionToEdit?.id || 'new'}>
           <DialogHeader>
             <DialogTitle className="font-headline">
               {transactionToEdit ? "Edit Recurring" : "Add Recurring"}
@@ -110,7 +110,7 @@ export function AddScheduledTransactionDialog({
                 Type
               </Label>
               <div className="col-span-3">
-                <Select name="type" value={transactionType} onValueChange={setTransactionType}>
+                <Select name="type" defaultValue={transactionToEdit?.type || 'expense'} onValueChange={setTransactionType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
