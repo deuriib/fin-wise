@@ -18,6 +18,7 @@ import {
   LogOut,
   Repeat,
   CreditCard,
+  Landmark,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -29,6 +30,11 @@ const menuItems = [
     href: "/dashboard",
     icon: LayoutDashboard,
     label: "Dashboard",
+  },
+  {
+    href: "/dashboard/accounts",
+    icon: Landmark,
+    label: "Accounts",
   },
   {
     href: "/dashboard/transactions",

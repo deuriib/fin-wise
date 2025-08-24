@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Category, Transaction, CreditCard } from "@/lib/types";
+import type { Category, Transaction, CreditCard, BankAccount } from "@/lib/types";
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -28,6 +28,7 @@ interface AddTransactionDialogProps {
   onSubmit: (values: Omit<Transaction, "id">) => void;
   categories: Category[];
   creditCards: CreditCard[];
+  accounts: BankAccount[];
   transactionToEdit?: Transaction | null;
 }
 
@@ -37,6 +38,7 @@ export function AddTransactionDialog({
   onSubmit,
   categories,
   creditCards,
+  accounts,
   transactionToEdit,
 }: AddTransactionDialogProps) {
   const [transactionType, setTransactionType] = useState(transactionToEdit?.type || 'expense');
@@ -58,6 +60,7 @@ export function AddTransactionDialog({
             type: values.type,
             categoryId: values.categoryId,
             creditCardId: values.type === 'expense' && values.creditCardId ? values.creditCardId : undefined,
+            accountId: values.accountId ? values.accountId : undefined,
         }
         onSubmit(submissionData);
     }
@@ -127,6 +130,26 @@ export function AddTransactionDialog({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="accountId" className="text-right">
+                  Account
+                </Label>
+                <div className="col-span-3">
+                  <Select name="accountId" defaultValue={transactionToEdit?.accountId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {accounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
             </div>
             {transactionType === 'expense' && (
               <div className="grid grid-cols-4 items-center gap-4">

@@ -18,8 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, CreditCard as CreditCardIcon } from "lucide-react";
-import type { Category, Transaction, CreditCard } from "@/lib/types";
+import { MoreHorizontal, PlusCircle, CreditCard as CreditCardIcon, Landmark } from "lucide-react";
+import type { Category, Transaction, CreditCard, BankAccount } from "@/lib/types";
 import { AddTransactionDialog } from "./add-transaction-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,12 +29,14 @@ interface TransactionsClientProps {
   initialTransactions: Transaction[];
   categories: Category[];
   creditCards: CreditCard[];
+  accounts: BankAccount[];
 }
 
 export function TransactionsClient({
   initialTransactions,
   categories,
-  creditCards
+  creditCards,
+  accounts
 }: TransactionsClientProps) {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -91,6 +93,12 @@ export function TransactionsClient({
       return card ? card.name : null;
   }
 
+  const getAccountName = (accountId?: string) => {
+      if (!accountId) return null;
+      const account = accounts.find(a => a.id === accountId);
+      return account ? account.name : null;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -123,11 +131,17 @@ export function TransactionsClient({
                 (c) => c.id === transaction.categoryId
               );
               const cardName = getCardName(transaction.creditCardId);
+              const accountName = getAccountName(transaction.accountId);
               return (
                 <TableRow key={transaction.id}>
                   <TableCell className="font-medium">
-                    {transaction.description}
-                    {cardName && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><CreditCardIcon className="h-3 w-3" /> {cardName}</div>}
+                    <div className="flex flex-col">
+                      <span>{transaction.description}</span>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+                        {accountName && <div className="flex items-center gap-1"><Landmark className="h-3 w-3" /> {accountName}</div>}
+                        {cardName && <div className="flex items-center gap-1"><CreditCardIcon className="h-3 w-3" /> {cardName}</div>}
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{category?.name}</Badge>
@@ -189,6 +203,7 @@ export function TransactionsClient({
         onSubmit={handleSubmit}
         categories={categories}
         creditCards={creditCards}
+        accounts={accounts}
         transactionToEdit={transactionToEdit}
       />
     </div>

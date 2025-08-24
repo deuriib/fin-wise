@@ -8,6 +8,15 @@ export interface Transaction {
   type: 'income' | 'expense';
   categoryId: string;
   creditCardId?: string;
+  accountId?: string;
+}
+
+export interface BankAccount {
+  id: string;
+  name: string;
+  bankName: string;
+  accountNumberLast4: string;
+  type: 'checking' | 'savings';
 }
 
 export interface CreditCard {

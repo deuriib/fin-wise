@@ -21,6 +21,8 @@ function getPageTitle(pathname: string) {
   switch (pathname) {
     case "/dashboard":
       return "Dashboard";
+    case "/dashboard/accounts":
+      return "Accounts";
     case "/dashboard/transactions":
       return "Transactions";
     case "/dashboard/recurring":
