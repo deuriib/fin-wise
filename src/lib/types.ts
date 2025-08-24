@@ -28,6 +28,7 @@ export interface CreditCard {
     bank: string;
     statementDate: number; // Day of the month
     dueDate: number; // Day of the month
+    creditLimit: number;
 }
 
 export interface Category {

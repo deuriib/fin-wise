@@ -1,7 +1,7 @@
 // src/components/dashboard/credit-cards-client.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import type { BankAccount, CreditCard, Transaction } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
@@ -17,6 +17,7 @@ import { addDocument, updateDocument, deleteDocument } from "@/services/firestor
 import { useToast } from "@/hooks/use-toast";
 import { AddCreditCardDialog } from "./add-credit-card-dialog";
 import { CreditCardAdvice } from "./credit-card-advice";
+import { Progress } from "../ui/progress";
 
 interface CreditCardsClientProps {
   initialCreditCards: CreditCard[];
@@ -35,6 +36,23 @@ export function CreditCardsClient({
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [cardToEdit, setCardToEdit] = useState<CreditCard | null>(null);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const cardsWithBalance = useMemo(() => {
+    return initialCreditCards.map(card => {
+        const balance = transactions
+            .filter(t => t.creditCardId === card.id && t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0);
+        const availableCredit = card.creditLimit - balance;
+        return { ...card, balance, availableCredit };
+    });
+  }, [initialCreditCards, transactions]);
 
   const handleAddCard = () => {
     setCardToEdit(null);
@@ -86,38 +104,53 @@ export function CreditCardsClient({
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {initialCreditCards.map((card) => (
-          <Card key={card.id}>
-            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-              <div>
-                <CardTitle className="text-lg font-medium font-headline">
-                  {card.name}
-                </CardTitle>
-                <CardDescription>{card.bank}</CardDescription>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleEditCard(card)}>Edit</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDeleteCard(card.id)} className="text-destructive">Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-2xl font-mono tracking-wider">
-                **** **** **** {card.last4}
-              </div>
-              <div className="text-xs text-muted-foreground flex justify-between">
-                <span>Expires: {`${String(card.expiryMonth).padStart(2, '0')}/${card.expiryYear}`}</span>
-              </div>
-              <CreditCardAdvice card={card} transactions={transactions} />
-            </CardContent>
-          </Card>
-        ))}
+        {cardsWithBalance.map((card) => {
+            const utilization = card.creditLimit > 0 ? (card.balance / card.creditLimit) * 100 : 0;
+            return (
+              <Card key={card.id}>
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+                  <div>
+                    <CardTitle className="text-lg font-medium font-headline">
+                      {card.name}
+                    </CardTitle>
+                    <CardDescription>{card.bank}</CardDescription>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditCard(card)}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeleteCard(card.id)} className="text-destructive">Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm font-mono tracking-wider">
+                    **** **** **** {card.last4}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm font-medium">
+                        <span>Balance</span>
+                        <span>{formatCurrency(card.balance)}</span>
+                    </div>
+                     <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Available Credit</span>
+                        <span>{formatCurrency(card.availableCredit)}</span>
+                    </div>
+                     <Progress value={utilization} className="h-2" />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Limit: {formatCurrency(card.creditLimit)}</span>
+                        <span>Utilization: {utilization.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                  <CreditCardAdvice card={card} transactions={transactions} />
+                </CardContent>
+              </Card>
+            )
+        })}
       </div>
 
       <AddCreditCardDialog

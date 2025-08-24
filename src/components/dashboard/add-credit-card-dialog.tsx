@@ -42,7 +42,7 @@ export function AddCreditCardDialog({
     const formData = new FormData(event.currentTarget);
     const values = Object.fromEntries(formData.entries()) as any;
     
-    if (values.name && values.last4 && values.expiryMonth && values.expiryYear && values.bank && values.statementDate && values.dueDate) {
+    if (values.name && values.last4 && values.expiryMonth && values.expiryYear && values.bank && values.statementDate && values.dueDate && values.creditLimit) {
       onSubmit({
         ...values,
         last4: values.last4.slice(-4),
@@ -50,6 +50,7 @@ export function AddCreditCardDialog({
         expiryYear: parseInt(values.expiryYear),
         statementDate: parseInt(values.statementDate),
         dueDate: parseInt(values.dueDate),
+        creditLimit: parseFloat(values.creditLimit),
       });
     }
   };
@@ -96,6 +97,10 @@ export function AddCreditCardDialog({
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="last4" className="text-right">Card Number</Label>
               <Input id="last4" name="last4" placeholder="Last 4 digits" defaultValue={cardToEdit?.last4} className="col-span-3" required minLength={4} maxLength={16} />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="creditLimit" className="text-right">Credit Limit</Label>
+              <Input id="creditLimit" name="creditLimit" type="number" step="0.01" placeholder="e.g., 5000" defaultValue={cardToEdit?.creditLimit} className="col-span-3" required />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Expiry</Label>
