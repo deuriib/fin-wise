@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { addDocument, updateDocument, deleteDocument } from "@/services/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { AddAccountDialog } from "./add-account-dialog";
+import Link from "next/link";
 
 interface AccountsClientProps {
   initialAccounts: BankAccount[];
@@ -38,12 +39,16 @@ export function AccountsClient({
     setIsDialogOpen(true);
   };
 
-  const handleEditAccount = (account: BankAccount) => {
+  const handleEditAccount = (e: React.MouseEvent, account: BankAccount) => {
+    e.preventDefault();
+    e.stopPropagation();
     setAccountToEdit(account);
     setIsDialogOpen(true);
   };
 
-  const handleDeleteAccount = async (id: string) => {
+  const handleDeleteAccount = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await deleteDocument(accountsPath, id);
       toast({ title: "Account deleted successfully." });
@@ -103,33 +108,35 @@ export function AccountsClient({
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {accountsWithBalance.map((account) => (
-          <Card key={account.id}>
-            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-              <div>
-                <CardTitle className="text-lg font-medium font-headline">
-                  {account.name}
-                </CardTitle>
-                <CardDescription>{account.bankName}</CardDescription>
-              </div>
-               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleEditAccount(account)}>Edit</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDeleteAccount(account.id)} className="text-destructive">Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
-              <p className="text-xs text-muted-foreground">
-                {account.type.charAt(0).toUpperCase() + account.type.slice(1)} Account (...{account.accountNumberLast4})
-              </p>
-            </CardContent>
-          </Card>
+          <Link href={`/dashboard/accounts/${account.id}`} key={account.id} className="block hover:shadow-lg transition-shadow rounded-lg">
+            <Card className="h-full">
+              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+                <div>
+                  <CardTitle className="text-lg font-medium font-headline">
+                    {account.name}
+                  </CardTitle>
+                  <CardDescription>{account.bankName}</CardDescription>
+                </div>
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={(e) => handleEditAccount(e, account)}>Edit</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleDeleteAccount(e, account.id)} className="text-destructive">Delete</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
+                <p className="text-xs text-muted-foreground">
+                  {account.type.charAt(0).toUpperCase() + account.type.slice(1)} Account (...{account.accountNumberLast4})
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
