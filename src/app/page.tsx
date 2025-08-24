@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FinWiseLogo } from "@/components/icons/logo";
-import { ArrowRight, CheckCircle, TrendingUp, Wallet } from "lucide-react";
+import { ArrowRight, BarChart, BrainCircuit, Wallet } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,19 +8,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm">
+      <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm shrink-0">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
           <FinWiseLogo className="h-8 w-auto" />
           <span className="sr-only">FinWise</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            href="/login"
-            className="text-sm font-medium hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            Sign In
-          </Link>
+          <Button variant="ghost" asChild>
+            <Link
+              href="/login"
+              className="text-sm font-medium hover:underline underline-offset-4"
+              prefetch={false}
+            >
+              Sign In
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/signup">
               Get Started <ArrowRight className="ml-2 h-4 w-4" />
@@ -29,11 +31,11 @@ export default function Home() {
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+        <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+            <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_600px] items-center">
               <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
                     Take Control of Your Finances with <span className="text-primary">FinWise</span>
                   </h1>
@@ -60,11 +62,11 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-secondary/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
+                <div className="inline-block rounded-lg bg-primary/10 text-primary px-3 py-1 text-sm font-medium">Key Features</div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Everything You Need to Succeed</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   From smart budgeting to AI-powered insights, FinWise gives you the tools to achieve your financial goals.
@@ -72,36 +74,36 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 mt-12">
-              <Card className="shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="bg-accent rounded-md p-2">
-                    <Wallet className="h-6 w-6 text-accent-foreground" />
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+                <CardHeader className="flex flex-col items-center text-center gap-4">
+                  <div className="bg-accent rounded-full p-3">
+                    <Wallet className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">Smart Budgeting</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-center">
                   <p>Create custom budgets that are easy to track. Get alerts before you overspend and stay on top of your financial goals.</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center gap-4">
-                   <div className="bg-accent rounded-md p-2">
-                    <TrendingUp className="h-6 w-6 text-accent-foreground" />
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+                <CardHeader className="flex flex-col items-center text-center gap-4">
+                   <div className="bg-accent rounded-full p-3">
+                    <BarChart className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">Expense Tracking</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-center">
                   <p>Effortlessly log every transaction. Categorize your spending to see where your money is going and identify savings opportunities.</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center gap-4">
-                   <div className="bg-accent rounded-md p-2">
-                    <CheckCircle className="h-6 w-6 text-accent-foreground" />
+              <Card className="shadow-md hover:shadow-lg transition-shadow border-0 bg-transparent">
+                <CardHeader className="flex flex-col items-center text-center gap-4">
+                   <div className="bg-accent rounded-full p-3">
+                    <BrainCircuit className="h-8 w-8 text-accent-foreground" />
                   </div>
                   <CardTitle className="font-headline text-2xl">AI Insights</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-center">
                   <p>Receive personalized recommendations and a Financial Wellness Score to gamify your financial journey and make better decisions.</p>
                 </CardContent>
               </Card>

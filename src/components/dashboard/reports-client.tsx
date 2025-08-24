@@ -19,6 +19,8 @@ import {
   Legend,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
 } from "recharts";
 
 interface ReportsClientProps {
@@ -38,13 +40,22 @@ export function ReportsClient({
   };
   
   // Data for spending trends line chart
-  const spendingTrendsData = transactions
-    .filter(t => t.type === 'expense')
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .map(t => ({
-      date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      amount: t.amount,
-    }));
+  const monthlyData: { [key: string]: { income: number, expense: number } } = {};
+
+  transactions.forEach(t => {
+      const month = new Date(t.date).toLocaleString('default', { month: 'short', year: '2-digit' });
+      if (!monthlyData[month]) {
+          monthlyData[month] = { income: 0, expense: 0 };
+      }
+      monthlyData[month][t.type] += t.amount;
+  });
+
+  const incomeVsExpenseData = Object.keys(monthlyData).map(month => ({
+    name: month,
+    Income: monthlyData[month].income,
+    Expenses: monthlyData[month].expense
+  })).sort((a,b) => new Date(`1 ${a.name}`).getTime() - new Date(`1 ${b.name}`).getTime());
+
 
   // Data for category spending bar chart
   const categorySpendingData = categories
@@ -55,6 +66,7 @@ export function ReportsClient({
       return {
         name: category.name,
         total: total,
+        fill: "hsl(var(--primary))",
       };
     })
     .filter(c => c.total > 0)
@@ -65,16 +77,12 @@ export function ReportsClient({
     if (active && payload && payload.length) {
       return (
         <div className="rounded-lg border bg-background p-2 shadow-sm">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col space-y-1">
-              <span className="text-[0.70rem] uppercase text-muted-foreground">
-                {payload[0].name === 'total' ? 'Spending' : 'Amount'}
-              </span>
-              <span className="font-bold text-muted-foreground">
-                {formatCurrency(payload[0].value)}
-              </span>
+          <p className="font-bold mb-2">{label}</p>
+          {payload.map((pld: any, index: number) => (
+            <div key={index} style={{ color: pld.color }}>
+              <strong>{pld.name}:</strong> {formatCurrency(pld.value)}
             </div>
-          </div>
+          ))}
         </div>
       )
     }
@@ -91,50 +99,53 @@ export function ReportsClient({
         </div>
         
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-headline">Spending Trends</CardTitle>
+            <CardTitle className="font-headline">Income vs. Expenses</CardTitle>
             <CardDescription>
-              Your total expenses over time.
+              Your income compared to your expenses over time.
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[300px] lg:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={spendingTrendsData}>
+              <AreaChart data={incomeVsExpenseData}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis dataKey="name" />
                 <YAxis tickFormatter={(value) => formatCurrency(value)} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="amount"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={false}
-                  name="Expense"
-                />
-              </LineChart>
+                <Area type="monotone" dataKey="Income" stroke="hsl(var(--accent))" fillOpacity={1} fill="url(#colorIncome)" />
+                <Area type="monotone" dataKey="Expenses" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorExpense)" />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="font-headline">Category Spending</CardTitle>
             <CardDescription>
               How your spending is distributed across categories.
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[300px] lg:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categorySpendingData}>
+              <BarChart data={categorySpendingData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={60} />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} />
+                <XAxis type="number" tickFormatter={(value) => formatCurrency(value)}/>
+                <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="total" fill="hsl(var(--accent))" name="Total Spent" />
+                <Bar dataKey="total" name="Total Spent" barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

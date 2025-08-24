@@ -1,14 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Wallet, PiggyBank, BarChart3, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DollarSign, Wallet, PiggyBank, BarChart3, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
 import type { Budget, Category, Transaction } from "@/lib/types";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Pie, PieChart, Cell } from "recharts";
+import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { WellnessScore } from "./wellness-score";
 import { AIInsights } from "./ai-insights";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 interface DashboardClientProps {
   transactions: Transaction[];
@@ -62,7 +65,7 @@ export function DashboardClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalIncome)}</div>
@@ -72,7 +75,7 @@ export function DashboardClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
@@ -85,16 +88,15 @@ export function DashboardClient({
             <PiggyBank className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(netSavings)}</div>
+            <div className={`text-2xl font-bold ${netSavings >= 0 ? 'text-accent' : 'text-destructive'}`}>{formatCurrency(netSavings)}</div>
             <p className="text-xs text-muted-foreground">This month</p>
           </CardContent>
         </Card>
-         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+         <Card className="flex flex-col">
+          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">AI Tools</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="flex flex-col gap-2">
+          <CardContent className="flex-1 flex flex-col justify-end gap-2">
             <WellnessScore transactions={transactions} income={totalIncome} />
             <AIInsights transactions={transactions} budgets={budgets} income={totalIncome} />
           </CardContent>
@@ -103,8 +105,16 @@ export function DashboardClient({
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle className="font-headline">Recent Transactions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-headline">Recent Transactions</CardTitle>
+              <CardDescription>Your 5 most recent transactions.</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/transactions">
+                    View All <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -124,7 +134,7 @@ export function DashboardClient({
                       <Badge variant="outline">{categories.find(c => c.id === transaction.categoryId)?.name}</Badge>
                     </TableCell>
                     <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                    <TableCell className={`text-right font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                    <TableCell className={`text-right font-medium ${transaction.type === 'income' ? 'text-accent' : 'text-destructive'}`}>
                       {transaction.type === 'expense' ? '-' : ''}{formatCurrency(transaction.amount)}
                     </TableCell>
                   </TableRow>
@@ -137,11 +147,21 @@ export function DashboardClient({
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="font-headline">Spending Breakdown</CardTitle>
+            <CardDescription>Your expense distribution by category.</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={spendingByCategory} dataKey="total" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                  <Pie data={spendingByCategory} dataKey="total" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                      const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                      const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                      return (
+                        <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-xs font-medium">
+                          {`${(percent * 100).toFixed(0)}%`}
+                        </text>
+                      );
+                    }}>
                      {spendingByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
@@ -156,19 +176,23 @@ export function DashboardClient({
       <Card>
         <CardHeader>
           <CardTitle className="font-headline">Budget Progress</CardTitle>
+           <CardDescription>How you are tracking against your monthly budgets.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
             {budgetsWithSpent.length > 0 ? budgetsWithSpent.map(budget => {
                 const category = categories.find(c => c.id === budget.categoryId);
-                const progress = (budget.spent / budget.limit) * 100;
+                const progress = Math.min((budget.spent / budget.limit) * 100, 100);
                 return (
                     <div key={budget.id}>
-                        <div className="flex justify-between mb-1">
-                            <span className="text-sm font-medium">{category?.name}</span>
-                            <span className="text-sm text-muted-foreground">{formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}</span>
+                        <div className="flex justify-between mb-1 text-sm">
+                            <span className="font-medium">{category?.name}</span>
+                            <span className="text-muted-foreground">{formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}</span>
                         </div>
-                        <Progress value={progress} />
-                        {progress > 100 && <p className="text-xs text-destructive mt-1 flex items-center"><AlertCircle className="h-3 w-3 mr-1"/>Over budget!</p>}
+                        <div className="flex items-center gap-2">
+                           <Progress value={progress} className="h-2"/>
+                           <span className="text-xs font-semibold text-muted-foreground w-10 text-right">{Math.round(progress)}%</span>
+                        </div>
+                        {progress >= 100 && <p className="text-xs text-destructive mt-1 flex items-center"><AlertCircle className="h-3 w-3 mr-1"/>Over budget!</p>}
                     </div>
                 )
             }) : <p className="text-sm text-muted-foreground">No budgets created yet.</p>}
