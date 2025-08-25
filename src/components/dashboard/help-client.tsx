@@ -56,6 +56,12 @@ export function HelpClient() {
                 Create and manage your spending budgets on the Budgets page. Set a limit for any category (e.g., $500 for groceries) for a specific period (monthly or yearly). The app will track your spending against these budgets to help you stay on target.
               </AccordionContent>
             </AccordionItem>
+             <AccordionItem value="item-9">
+              <AccordionTrigger>Goals</AccordionTrigger>
+              <AccordionContent>
+                Set and track your financial goals on the Goals page. You can define a target amount, a deadline, and link a savings account to monitor your progress. Use the "Get Goal Advice" feature to receive an AI-powered plan with actionable steps to help you reach your target.
+              </AccordionContent>
+            </AccordionItem>
              <AccordionItem value="item-6">
               <AccordionTrigger>Credit Cards</AccordionTrigger>
               <AccordionContent>
