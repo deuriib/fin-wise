@@ -21,6 +21,7 @@ import {
   CreditCard,
   Landmark,
   HelpCircle,
+  Target,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -52,6 +53,11 @@ const menuItems = [
     href: "/dashboard/budgets",
     icon: CircleDollarSign,
     label: "Budgets",
+  },
+  {
+    href: "/dashboard/goals",
+    icon: Target,
+    label: "Goals",
   },
    {
     href: "/dashboard/credit-cards",

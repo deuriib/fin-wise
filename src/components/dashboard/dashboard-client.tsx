@@ -1,8 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DollarSign, Wallet, PiggyBank, BarChart3, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
-import type { Budget, Category, Transaction, BankAccount, CreditCard } from "@/lib/types";
+import { DollarSign, Wallet, PiggyBank, Target, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import type { Budget, Category, Transaction, BankAccount, CreditCard, Goal } from "@/lib/types";
 import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ interface DashboardClientProps {
   categories: Category[];
   accounts: BankAccount[];
   creditCards: CreditCard[];
+  goals: Goal[];
 }
 
 export function DashboardClient({
@@ -27,6 +28,7 @@ export function DashboardClient({
   categories,
   accounts,
   creditCards,
+  goals,
 }: DashboardClientProps) {
   const totalIncome = transactions
     .filter((t) => t.type === "income")
@@ -177,31 +179,56 @@ export function DashboardClient({
         </Card>
       </div>
       
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Budget Progress</CardTitle>
-           <CardDescription>How you are tracking against your monthly budgets.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            {budgetsWithSpent.length > 0 ? budgetsWithSpent.map(budget => {
-                const category = categories.find(c => c.id === budget.categoryId);
-                const progress = Math.min((budget.spent / budget.limit) * 100, 100);
-                return (
-                    <div key={budget.id}>
-                        <div className="flex justify-between mb-1 text-sm">
-                            <span className="font-medium">{category?.name}</span>
-                            <span className="text-muted-foreground">{formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <Progress value={progress} className="h-2"/>
-                           <span className="text-xs font-semibold text-muted-foreground w-10 text-right">{Math.round(progress)}%</span>
-                        </div>
-                        {progress >= 100 && <p className="text-xs text-destructive mt-1 flex items-center"><AlertCircle className="h-3 w-3 mr-1"/>Over budget!</p>}
-                    </div>
-                )
-            }) : <p className="text-sm text-muted-foreground">No budgets created yet.</p>}
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">Budget Progress</CardTitle>
+            <CardDescription>How you are tracking against your monthly budgets.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              {budgetsWithSpent.length > 0 ? budgetsWithSpent.map(budget => {
+                  const category = categories.find(c => c.id === budget.categoryId);
+                  const progress = Math.min((budget.spent / budget.limit) * 100, 100);
+                  return (
+                      <div key={budget.id}>
+                          <div className="flex justify-between mb-1 text-sm">
+                              <span className="font-medium">{category?.name}</span>
+                              <span className="text-muted-foreground">{formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Progress value={progress} className="h-2"/>
+                            <span className="text-xs font-semibold text-muted-foreground w-10 text-right">{Math.round(progress)}%</span>
+                          </div>
+                          {progress >= 100 && <p className="text-xs text-destructive mt-1 flex items-center"><AlertCircle className="h-3 w-3 mr-1"/>Over budget!</p>}
+                      </div>
+                  )
+              }) : <p className="text-sm text-muted-foreground">No budgets created yet.</p>}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">Goal Progress</CardTitle>
+            <CardDescription>An overview of your financial goals.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              {goals.length > 0 ? goals.map(goal => {
+                  const progress = Math.min((goal.savedAmount / goal.targetAmount) * 100, 100);
+                  return (
+                      <div key={goal.id}>
+                          <div className="flex justify-between mb-1 text-sm">
+                              <span className="font-medium">{goal.name}</span>
+                              <span className="text-muted-foreground">{formatCurrency(goal.savedAmount)} / {formatCurrency(goal.targetAmount)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Progress value={progress} className="h-2"/>
+                            <span className="text-xs font-semibold text-muted-foreground w-10 text-right">{Math.round(progress)}%</span>
+                          </div>
+                      </div>
+                  )
+              }) : <p className="text-sm text-muted-foreground">No goals created yet.</p>}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

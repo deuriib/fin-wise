@@ -29,6 +29,8 @@ function getPageTitle(pathname: string) {
       return "Recurring";
     case "/dashboard/budgets":
       return "Budgets";
+    case "/dashboard/goals":
+      return "Goals";
     case "/dashboard/credit-cards":
       return "Credit Cards";
     case "/dashboard/reports":

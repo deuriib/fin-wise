@@ -59,3 +59,13 @@ export interface ScheduledTransaction {
   lastProcessedDate?: string;
   accountId?: string;
 }
+
+export interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  savedAmount: number;
+  targetDate: string;
+  description?: string;
+  accountId?: string;
+}
